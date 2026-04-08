@@ -1,268 +1,1073 @@
 <!DOCTYPE html>
-<<!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Perpustakaan Desri</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>NHL | Desri Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
- <script>
-        function showPage(pageId) {
-            var pages = document.getElementsByClassName("page");
-            for (var i = 0; i < pages.length; i++) {
-                pages[i].style.display = "none";
-            }
-            document.getElementById(pageId).style.display = "block";
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --maroon: #8b0000;
+            --maroon-dark: #5c0000;
+            --maroon-light: #b30000;
+            --gold: #c9a84c;
+            --cream: #fdf8f2;
+            --dark: #1a1a1a;
         }
 
-        function logout() {
-            var forms = document.getElementsByTagName("form");
-            for (var i = 0; i < forms.length; i++) {
-                forms[i].reset();
-            }
-            showPage('login');
-        }
- </script>
+        * { box-sizing: border-box; }
 
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ===== NAVBAR ===== */
+        .navbar-nhl {
+            background: var(--maroon);
+            padding: 0.6rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+        }
+
+        .navbar-brand-nhl {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold) !important;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .hamburger-btn {
+            background: transparent;
+            border: 2px solid rgba(201,168,76,0.6);
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: border-color 0.2s;
+        }
+        .hamburger-btn:hover { border-color: var(--gold); }
+        .hamburger-btn span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Sidebar Drawer (mobile) */
+        .nav-drawer {
+            position: fixed;
+            top: 0; right: -280px;
+            width: 270px;
+            height: 100vh;
+            background: var(--maroon-dark);
+            z-index: 1050;
+            transition: right 0.3s ease;
+            padding: 80px 0 20px;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+        .nav-drawer.open { right: 0; }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+        .nav-overlay.open { display: block; }
+
+        .drawer-close {
+            position: absolute;
+            top: 18px; right: 18px;
+            background: transparent;
+            border: none;
+            color: var(--gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .drawer-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 24px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .drawer-nav a:hover,
+        .drawer-nav a.active {
+            background: rgba(201,168,76,0.12);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+        .drawer-nav a i { font-size: 1.1rem; width: 20px; text-align: center; }
+
+        /* Desktop nav links */
+        .desktop-nav { display: none; align-items: center; gap: 0; }
+        .desktop-nav a {
+            padding: 8px 13px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .desktop-nav a:hover,
+        .desktop-nav a.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        @media (min-width: 992px) {
+            .hamburger-btn { display: none; }
+            .desktop-nav { display: flex; }
+        }
+
+        /* ===== HERO / WELCOME ===== */
+        .welcome-hero {
+            background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 60%, #a00000 100%);
+            color: white;
+            padding: 3.5rem 1.5rem 3rem;
+            text-align: center;
+        }
+        .welcome-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+        .welcome-hero p {
+            font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+            line-height: 1.75;
+            opacity: 0.9;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .section-hero {
+            background: linear-gradient(135deg, var(--maroon-dark), var(--maroon));
+            color: white;
+            padding: 2.5rem 1.5rem 2rem;
+            text-align: center;
+        }
+        .section-hero h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        .section-hero p { opacity: 0.85; margin: 0; font-size: 0.95rem; }
+
+        /* ===== CARDS ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+            padding: 1.8rem 1.2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (min-width: 600px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 900px) { .cards-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .card-nhl {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e8ddd0;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-nhl:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(139,0,0,0.12);
+        }
+        .card-nhl-body { padding: 1.4rem 1.5rem; }
+        .card-nhl h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--maroon);
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+        }
+        .card-nhl p { font-size: 0.9rem; color: #555; line-height: 1.6; margin-bottom: 1rem; }
+        .card-nhl hr { border-color: #f0e8e0; margin: 0.8rem 0 1rem; }
+
+        .btn-maroon {
+            background: var(--maroon);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s, transform 0.1s;
+            cursor: pointer;
+        }
+        .btn-maroon:hover { background: var(--maroon-light); color: white; transform: scale(1.02); }
+
+        .btn-dark-navy {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-dark-navy:hover { background: #1a252f; color: white; }
+
+        .btn-green {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.87rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-green:hover { background: #1e8449; color: white; }
+
+        /* ===== KALKULATOR ===== */
+        .calc-table { width: 100%; }
+        .calc-table td { padding: 6px 0; }
+        .calc-table input, .calc-table select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .calc-result {
+            text-align: center;
+            font-weight: 700;
+            color: var(--maroon);
+            font-size: 1rem;
+            padding: 10px 0 0;
+        }
+
+        /* ===== KAMUS ===== */
+        .kamus-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        .kamus-result {
+            margin-top: 12px;
+            font-style: italic;
+            color: var(--maroon);
+            min-height: 24px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== VIDEO ===== */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: 0;
+        }
+
+        /* ===== EVENT TIMER ===== */
+        .event-timer {
+            font-weight: 700;
+            color: #d35400;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .event-status-open {
+            font-weight: 700;
+            color: #27ae60;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        /* ===== MAPS GRID ===== */
+        .map-card {
+            background: white;
+            border: 2px solid var(--maroon);
+            border-radius: 12px;
+            padding: 1.2rem 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .map-card:hover {
+            background: #fff5f5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(139,0,0,0.14);
+        }
+        .map-card h3 {
+            color: var(--maroon);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        .map-card p { font-size: 0.85rem; color: #666; margin: 0; line-height: 1.5; }
+        .map-card-admin { border-color: #2c3e50; background: #f9f9f9; }
+        .map-card-admin:hover { background: #eef2f5; }
+
+        /* ===== LOGIN PAGE ===== */
+        .login-page {
+            min-height: 100vh;
+            background: linear-gradient(160deg, var(--maroon-dark) 0%, #6b0000 50%, #3d0000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--maroon);
+            font-size: 1.7rem;
+            text-align: center;
+            margin-bottom: 0.3rem;
+        }
+        .login-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 1.8rem;
+        }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { font-size: 0.82rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+        .form-control-nhl {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1.5px solid #e0d4cc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .form-control-nhl:focus { border-color: var(--maroon); }
+
+        /* ===== SERVICE ===== */
+        .service-list { list-style: none; padding: 0; }
+        .service-list li {
+            padding: 14px 18px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--maroon);
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        /* ===== PROFIL ===== */
+        .profil-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem; border: 1px solid #e8ddd0; }
+        .profil-section h4 { color: var(--maroon); font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 0.7rem; }
+        .profil-section p { font-size: 0.92rem; line-height: 1.75; color: #444; margin: 0 0 0.5rem; }
+
+        /* ===== CONTACT ===== */
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e8ddd0;
+            text-decoration: none;
+            color: var(--dark);
+            font-size: 0.93rem;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .contact-link:hover { background: #fff5f5; border-color: var(--maroon); color: var(--maroon); }
+        .contact-link i { font-size: 1.2rem; color: var(--maroon); }
+
+        /* ===== ADMIN ===== */
+        .admin-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e8ddd0;
+            text-decoration: none;
+            color: var(--dark);
+            font-size: 0.93rem;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .admin-link:hover { background: #fff5f5; border-color: var(--maroon); color: var(--maroon); }
+        .admin-link i { font-size: 1.2rem; color: var(--maroon); }
+
+        /* ===== WHATSAPP FLOAT ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            width: 54px; height: 54px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(37,211,102,0.45);
+            text-decoration: none;
+            z-index: 999;
+            transition: transform 0.2s;
+        }
+        .whatsapp-float:hover { transform: scale(1.1); }
+        .whatsapp-float i { font-size: 1.6rem; color: white; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--maroon-dark);
+            color: rgba(255,255,255,0.65);
+            text-align: center;
+            padding: 1.2rem;
+            font-size: 0.82rem;
+            margin-top: 3rem;
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem 1.2rem;
+        }
+        .page-title-bar {
+            background: white;
+            border-bottom: 2px solid #f0e8e0;
+            padding: 1.2rem 1.5rem;
+        }
+        .page-title-bar h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--maroon);
+            margin: 0;
+            font-size: 1.4rem;
+        }
+    </style>
 </head>
 
-<body onload="showPage('login')">
+<body>
 
-<!-- ================= LOGIN ================= -->
-<div id="login" class="page">
-    <h2>Login Perpustakaan Desri</h2>
+<!-- ===== OVERLAY ===== -->
+<div class="nav-overlay" id="navOverlay" onclick="closeDrawer()"></div>
 
-    <form onsubmit="showPage('home'); return false;">
-        Last Name:<br>
-        <input type="text"><br><br>
-
-        First Name:<br>
-        <input type="text"><br><br>
-
-        Email:<br>
-        <input type="email"><br><br>
-
-        Password:<br>
-        <input type="password"><br><br>
-
-        No Handphone:<br>
-        <input type="text"><br><br>
-
-        <input type="submit" value="Login">
-    </form>
-
-    <p>Belum punya akun? 
-        <a href="#" onclick="showPage('register')">Daftar di sini</a>
-    </p>
+<!-- ===== DRAWER (Mobile) ===== -->
+<div class="nav-drawer" id="navDrawer">
+    <button class="drawer-close" onclick="closeDrawer()"><i class="bi bi-x-lg"></i></button>
+    <nav class="drawer-nav" id="drawerNav">
+        <a href="#" onclick="navTo('home')"><i class="bi bi-house-fill"></i> Home</a>
+        <a href="#" onclick="navTo('collection')"><i class="bi bi-book-fill"></i> Collection</a>
+        <a href="#" onclick="navTo('service')"><i class="bi bi-clock-fill"></i> Service</a>
+        <a href="#" onclick="navTo('profil')"><i class="bi bi-building"></i> Profil</a>
+        <a href="#" onclick="navTo('contact')"><i class="bi bi-envelope-fill"></i> Contact Us</a>
+        <a href="#" onclick="navTo('event')"><i class="bi bi-calendar-event-fill"></i> Event</a>
+        <a href="#" onclick="navTo('admin')"><i class="bi bi-person-fill-gear"></i> Admin</a>
+        <a href="#" onclick="navTo('maps')"><i class="bi bi-map-fill"></i> Maps</a>
+        <a href="#" onclick="doLogout()" style="margin-top:auto; border-top:1px solid rgba(255,255,255,0.1);"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </nav>
 </div>
 
-<!-- ================= REGISTER ================= -->
+<!-- ============================= LOGIN ============================= -->
+<div id="login" class="page active">
+    <div class="login-page">
+        <div class="login-box">
+            <div style="text-align:center; margin-bottom:1.2rem;">
+                <span style="font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color:var(--maroon);">NHL</span>
+            </div>
+            <h2 class="login-title">Selamat Datang</h2>
+            <p class="login-subtitle">Nias Heritage Library</p>
+            <form onsubmit="navTo('home'); return false;">
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" class="form-control-nhl" placeholder="Masukkan nama belakang">
+                </div>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" class="form-control-nhl" placeholder="Masukkan nama depan">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control-nhl" placeholder="email@contoh.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control-nhl" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>No Handphone</label>
+                    <input type="text" class="form-control-nhl" placeholder="08xxxxxxxxxx">
+                </div>
+                <button type="submit" class="btn-maroon" style="width:100%; padding:12px; font-size:1rem; margin-top:0.5rem;">Login</button>
+            </form>
+            <p style="text-align:center; margin-top:1.2rem; font-size:0.88rem; color:#777;">
+                Belum punya akun? <a href="#" onclick="navTo('register')" style="color:var(--maroon); font-weight:700;">Daftar di sini</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================= REGISTER ============================= -->
 <div id="register" class="page">
-    <h2>Daftar Akun Baru</h2>
-
-    <form onsubmit="showPage('login'); return false;">
-        Last Name:<br>
-        <input type="text"><br><br>
-
-        First Name:<br>
-        <input type="text"><br><br>
-
-        Email:<br>
-        <input type="email"><br><br>
-
-        No Handphone:<br>
-        <input type="text"><br><br>
-
-        Password:<br>
-        <input type="password"><br><br>
-
-        <input type="submit" value="Daftar">
-    </form>
+    <div class="login-page">
+        <div class="login-box">
+            <div style="text-align:center; margin-bottom:1.2rem;">
+                <span style="font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color:var(--maroon);">NHL</span>
+            </div>
+            <h2 class="login-title">Daftar Akun</h2>
+            <p class="login-subtitle">Buat akun baru Anda</p>
+            <form onsubmit="navTo('login'); return false;">
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" class="form-control-nhl" placeholder="Masukkan nama belakang">
+                </div>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" class="form-control-nhl" placeholder="Masukkan nama depan">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control-nhl" placeholder="email@contoh.com">
+                </div>
+                <div class="form-group">
+                    <label>No Handphone</label>
+                    <input type="text" class="form-control-nhl" placeholder="08xxxxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control-nhl" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-maroon" style="width:100%; padding:12px; font-size:1rem; margin-top:0.5rem;">Daftar</button>
+            </form>
+            <p style="text-align:center; margin-top:1.2rem; font-size:0.88rem; color:#777;">
+                Sudah punya akun? <a href="#" onclick="navTo('login')" style="color:var(--maroon); font-weight:700;">Login di sini</a>
+            </p>
+        </div>
+    </div>
 </div>
 
-<!-- ================= HOME ================= -->
+<!-- ============================= NAVBAR TEMPLATE ============================= -->
+<template id="navbarTemplate">
+    <nav class="navbar-nhl d-flex align-items-center justify-content-between">
+        <a class="navbar-brand-nhl">NHL</a>
+        <nav class="desktop-nav" id="desktopNav">
+            <a href="#" onclick="navTo('home')">Home</a>
+            <a href="#" onclick="navTo('collection')">Collection</a>
+            <a href="#" onclick="navTo('service')">Service</a>
+            <a href="#" onclick="navTo('profil')">Profil</a>
+            <a href="#" onclick="navTo('contact')">Contact</a>
+            <a href="#" onclick="navTo('event')">Event</a>
+            <a href="#" onclick="navTo('admin')">Admin</a>
+            <a href="#" onclick="navTo('maps')">Maps</a>
+            <a href="#" onclick="doLogout()" style="color:#ffaaaa;">Logout</a>
+        </nav>
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDrawer()">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+</template>
+
+<!-- ============================= HOME ============================= -->
 <div id="home" class="page">
-    <nav>
-        <a href="#" onclick="showPage('home')">Home</a>
-        <a href="#" onclick="showPage('collection')">Collection</a>
-        <a href="#" onclick="showPage('service')">Service</a>
-        <a href="#" onclick="showPage('profil')">Profil</a>
-        <a href="#" onclick="showPage('contact')">Contact Us</a>
-        <a href="#" onclick="showPage('admin')">Admin</a>
-        <a href="#" onclick="logout()">Logout</a>
-    </nav>
-
-    <hr>
-
-    <h1>Selamat Datang Di Halaman Web Saya</h1>
-    <h2>Sebelum itu izinkan saya perkenalan terlebih dahulu</h2>
-    <p>Nama : Desri Moralina Hia</p>
-    <p>NIM  : 230709012 </p>
-
-    <h3>Video Cara Mengisi KRS</h3>
-    <iframe width="560" height="315"
-        src="https://www.youtube.com/embed/Y_ZVTk2kesM">
-    </iframe>
+    <div id="nav-home"></div>
+    <div class="welcome-hero">
+        <h1>Welcome to Nias Heritage Library</h1>
+        <p>Selamat datang di Nias Heritage Library, ruang literasi digital yang menghadirkan kekayaan sejarah, budaya, dan pesona Nias dalam satu platform yang mudah diakses.</p>
+    </div>
+    <div class="cards-grid">
+        <!-- Kalkulator -->
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Kalkulator Perpustakaan</h3>
+                <table class="calc-table">
+                    <tr>
+                        <td style="width:80px; font-size:0.88rem; color:#666;">Angka 1</td>
+                        <td><input type="number" id="angka1" class="form-control-nhl" placeholder="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:0.88rem; color:#666;">Operasi</td>
+                        <td>
+                            <select id="operator" class="form-control-nhl">
+                                <option value="+">+</option>
+                                <option value="-">−</option>
+                                <option value="*">×</option>
+                                <option value="/">÷</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:0.88rem; color:#666;">Angka 2</td>
+                        <td><input type="number" id="angka2" class="form-control-nhl" placeholder="0"></td>
+                    </tr>
+                </table>
+                <button onclick="hitungKalkulator()" class="btn-maroon" style="width:100%; margin-top:12px;">Hitung</button>
+                <div class="calc-result" id="hasil">Hasil: —</div>
+            </div>
+        </div>
+        <!-- Kamus -->
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Kamus Mini Nias</h3>
+                <p>Pelajari kata dasar kebudayaan Nias:</p>
+                <input type="text" id="inputKata" class="kamus-input" placeholder="Contoh: Ya'ahowu">
+                <button onclick="cariArti()" class="btn-maroon" style="width:100%;">Cari Arti</button>
+                <p class="kamus-result" id="hasilKamus"></p>
+            </div>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
 </div>
 
+<!-- ============================= COLLECTION ============================= -->
 <div id="collection" class="page">
-    <nav>
-        <a href="#" onclick="showPage('home')">Home</a>
-        <a href="#" onclick="showPage('collection')">Collection</a>
-        <a href="#" onclick="showPage('service')">Service</a>
-        <a href="#" onclick="showPage('profil')">Profil</a>
-        <a href="#" onclick="showPage('contact')">Contact Us</a>
-        <a href="#" onclick="showPage('admin')">Admin</a>
-        <a href="#" onclick="logout()">Logout</a>
-    </nav>
-
-    <hr>
-
-    <h2>Collection</h2>
-    <ul>
-         <li>Asal Usul Orang Nias</li>
-        <p><a href="https://drive.google.com/file/d/1wi7LzKZ824M8pnYInvFmp3dVAtSkxHjF/view?usp=drive_link">Buka</a></p>
-        <li>Adat dan Budaya Suku Nias</li>
-        <p><a href="https://drive.google.com/file/d/1UXI4418mhWZkSAnyKd0mccH3XR2uC7tA/view?usp=drive_link">Buka</a></p>
-        <li>Museum Pusaka Nias</li>
-        <p><a href="https://museum-nias.org/">Buka</a></p>
-        <li>Cerita Rakyat Nias</li>
-        <p><a href="https://www.scribd.com/document/750395009/Legenda-Laowomaru">Buka</a></p>
-        <li>Jurnal Penelitian</li>
-        <p><a href="https://drive.google.com/file/d/14dmCk0IRwWuSxMkAgUswqb1CwMhcJyEf/view?usp=sharing">Buka</a></p>
-        <li>Dokumentasi</li>
-         <iframe width="560" height="315" src="https://www.youtube.com/embed/6mIdhdBSbbo?si=9N1yf1Js-CPcZIr9"
-    </ul>
+    <div id="nav-collection"></div>
+    <div class="section-hero">
+        <h2>Collection NHL</h2>
+        <p>Jelajahi berbagai dokumen sejarah, adat, dan penelitian tentang budaya Nias.</p>
+    </div>
+    <div class="cards-grid">
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Asal Usul Orang Nias</h3>
+                <p>Pelajari sejarah dan nenek moyang masyarakat Nias dari sumber terpercaya.</p>
+                <hr>
+                <a href="https://drive.google.com/file/d/1wi7LzKZ824M8pnYInvFmp3dVAtSkxHjF/view?usp=drive_link" target="_blank" class="btn-maroon">Buka Dokumen</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Adat & Budaya Suku Nias</h3>
+                <p>Kumpulan informasi tentang tradisi, hukum adat, dan kebiasaan leluhur.</p>
+                <hr>
+                <a href="https://drive.google.com/file/d/1UXI4418mhWZkSAnyKd0mccH3XR2uC7tA/view?usp=drive_link" target="_blank" class="btn-maroon">Buka Dokumen</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Museum Pusaka Nias</h3>
+                <p>Akses langsung ke situs resmi Museum Pusaka Nias untuk koleksi artefak.</p>
+                <hr>
+                <a href="https://museum-nias.org/" target="_blank" class="btn-dark-navy">Kunjungi Situs</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Cerita Rakyat Nias</h3>
+                <p>Legenda Laowomaru dan berbagai cerita rakyat menarik lainnya dari Pulau Nias.</p>
+                <hr>
+                <a href="https://www.scribd.com/document/750395009/Legenda-Laowomaru" target="_blank" class="btn-maroon">Baca Legenda</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Jurnal Penelitian</h3>
+                <p>Arsip ilmiah dan penelitian akademis mengenai warisan budaya Nias.</p>
+                <hr>
+                <a href="https://drive.google.com/file/d/14dmCk0IRwWuSxMkAgUswqb1CwMhcJyEf/view?usp=sharing" target="_blank" class="btn-maroon">Buka Jurnal</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>Dokumentasi Video</h3>
+                <p>Tonton cuplikan dokumenter tentang tradisi dan keindahan alam Nias.</p>
+                <hr>
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/6mIdhdBSbbo" allowfullscreen></iframe>
+                </div>
+                <div class="video-wrapper" style="margin-top:10px;">
+                    <iframe src="https://www.youtube.com/embed/ge-yg6m2sf8" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
 </div>
 
+<!-- ============================= SERVICE ============================= -->
 <div id="service" class="page">
-    <nav>
-         <a href="#" onclick="showPage('home')">Home</a>
-        <a href="#" onclick="showPage('collection')">Collection</a>
-        <a href="#" onclick="showPage('service')">Service</a>
-        <a href="#" onclick="showPage('profil')">Profil</a>
-        <a href="#" onclick="showPage('contact')">Contact Us</a>
-        <a href="#" onclick="showPage('admin')">Admin</a>
-        <a href="#" onclick="logout()">Logout</a>
-    </nav>
-
-    <hr>
-
-    <h2>Opening Time</h2>
-    <ul>
-        <li>Senin - Jumat : 08.00 - 16.00</li>
-        <li>Sabtu : 09.00 - 14.00</li>
-        <li>Minggu : Tutup</li>
-    </ul>
+    <div id="nav-service"></div>
+    <div class="section-hero">
+        <h2>Service</h2>
+        <p>Jam layanan perpustakaan kami.</p>
+    </div>
+    <div class="content-wrapper">
+        <ul class="service-list">
+            <li><i class="bi bi-clock" style="color:var(--maroon);margin-right:10px;"></i><strong>Senin – Jumat:</strong> 08.00 – 16.00 WIB</li>
+            <li><i class="bi bi-clock" style="color:var(--maroon);margin-right:10px;"></i><strong>Sabtu:</strong> 09.00 – 14.00 WIB</li>
+            <li><i class="bi bi-x-circle" style="color:#c0392b;margin-right:10px;"></i><strong>Minggu:</strong> Tutup</li>
+        </ul>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
 </div>
 
+<!-- ============================= PROFIL ============================= -->
 <div id="profil" class="page">
-    <nav>
-        <a href="#" onclick="showPage('home')">Home</a>
-        <a href="#" onclick="showPage('collection')">Collection</a>
-        <a href="#" onclick="showPage('service')">Service</a>
-        <a href="#" onclick="showPage('profil')">Profil</a>
-        <a href="#" onclick="showPage('contact')">Contact Us</a>
-        <a href="#" onclick="showPage('admin')">Admin</a>
-        <a href="#" onclick="logout()">Logout</a>
-    </nav>
-
-    <hr>
-
-    <h2>About Libraries</h2>
-    <p>Nias Heritage Library berdiri sejak tahun 2026 dengan tujuan meningkatkan literasi dan akses informasi yang merupakan 
-       perpustakaan umum berbasis digital yang berfungsi sebagai pusat informasi tentang sejarah, budaya, wisata, serta perkembangan daerah Nias.</p>
-    <h3>Visi</h3>
-    <p>Menjadi pusat informasi dan referensi digital terpercaya yang melestarikan serta memperkenalkan sejarah, budaya, dan kekayaan daerah Nias kepada masyarakat luas.</p>
-    <h4>Misi</h4>
-    <ul>
-        <li>1. Menghimpun dan menyediakan koleksi informasi tentang Nias secara lengkap dan terstruktur.</li>
-        <li>2. Memanfaatkan teknologi digital untuk mempermudah akses informasi.</li>
-        <li>3. Mendukung kegiatan pendidikan dan penelitian.</li>
-        <li>4. Menjadi media edukasi untuk mencintai identitas daerah Nias.</li>
-    </ul>
+    <div id="nav-profil"></div>
+    <div class="section-hero">
+        <h2>Tentang Kami</h2>
+        <p>Kenali lebih dalam Nias Heritage Library.</p>
+    </div>
+    <div class="content-wrapper">
+        <div class="profil-section">
+            <h4>Tentang NHL</h4>
+            <p>Nias Heritage Library berdiri sejak tahun 2026, merupakan perpustakaan umum berbasis digital yang berfungsi sebagai pusat informasi tentang sejarah, budaya, dan wisata Nias. Perpustakaan ini dapat diakses oleh semua kalangan dari pelajar, mahasiswa, peneliti hingga wisatawan.</p>
+        </div>
+        <div class="profil-section">
+            <h4>Visi</h4>
+            <p>Menjadi pusat informasi dan referensi digital terpercaya yang melestarikan serta memperkenalkan sejarah, budaya, dan kekayaan daerah Nias kepada masyarakat luas.</p>
+        </div>
+        <div class="profil-section">
+            <h4>Misi</h4>
+            <p>• Menghimpun dan menyediakan koleksi informasi tentang sejarah, budaya, wisata, dan perkembangan Nias secara lengkap dan terstruktur.</p>
+            <p>• Memanfaatkan teknologi digital untuk mempermudah akses informasi bagi semua kalangan.</p>
+            <p>• Mendukung kegiatan pendidikan, penelitian, dan pelestarian warisan budaya Nias.</p>
+            <p>• Menjadi media edukasi yang membantu masyarakat mengenal dan mencintai identitas daerah Nias.</p>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
 </div>
 
+<!-- ============================= CONTACT ============================= -->
 <div id="contact" class="page">
-    <nav>
-        <a href="#" onclick="showPage('home')">Home</a>
-        <a href="#" onclick="showPage('collection')">Collection</a>
-        <a href="#" onclick="showPage('service')">Service</a>
-        <a href="#" onclick="showPage('profil')">Profil</a>
-        <a href="#" onclick="showPage('contact')">Contact Us</a>
-        <a href="#" onclick="showPage('admin')">Admin</a>
-        <a href="#" onclick="logout()">Logout</a>
-    </nav>
+    <div id="nav-contact"></div>
+    <div class="section-hero">
+        <h2>Contact Us</h2>
+        <p>Hubungi kami melalui berbagai saluran berikut.</p>
+    </div>
+    <div class="content-wrapper">
+        <a href="mailto:desmor830@gmail.com" class="contact-link">
+            <i class="bi bi-envelope-fill"></i> desmor830@gmail.com
+        </a>
+        <a href="https://wa.me/6281360758627" target="_blank" class="contact-link">
+            <i class="bi bi-whatsapp"></i> WhatsApp Admin
+        </a>
+        <a href="https://www.instagram.com/desri_hia" target="_blank" class="contact-link">
+            <i class="bi bi-instagram"></i> Instagram
+        </a>
+        <a href="https://www.facebook.com/share/1GPpua2KP3/" target="_blank" class="contact-link">
+            <i class="bi bi-facebook"></i> Facebook
+        </a>
 
-    <hr>
+        <div class="profil-section" style="margin-top:1.5rem;">
+            <h4>Formulir Pesan</h4>
+            <form onsubmit="alert('Pesan terkirim!'); return false;">
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" class="form-control-nhl" placeholder="Nama Anda">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control-nhl" placeholder="email@anda.com">
+                </div>
+                <div class="form-group">
+                    <label>Pesan</label>
+                    <textarea class="form-control-nhl" rows="4" placeholder="Tulis pesan..."></textarea>
+                </div>
+                <button type="submit" class="btn-maroon">Kirim Pesan</button>
+            </form>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
+</div>
 
-    <h2>Contact Us</h2>
+<!-- ============================= EVENT ============================= -->
+<div id="event" class="page">
+    <div id="nav-event"></div>
+    <div class="section-hero">
+        <h2>Event & Kegiatan</h2>
+        <p>Ikuti berbagai kegiatan literasi dan pelestarian budaya Nias bersama kami.</p>
+    </div>
+    <div class="cards-grid">
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>LENTERA NIAS</h3>
+                <p class="event-timer" id="timer"></p>
+                <p style="font-size:0.85rem; color:#777; font-style:italic; margin-bottom:12px;">(Literasi Digital untuk Pelestarian Budaya Nias)</p>
+                <hr>
+                <p>📅 Senin, 30 Maret 2026</p>
+                <p>🕒 10.00 WIB – Selesai</p>
+                <p>📍 Zoom Meeting</p>
+                <br>
+                <a href="https://wa.me/6281360758627" target="_blank" class="btn-maroon">Daftar Disini</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>NIAS STORYTELLING</h3>
+                <p class="event-status-open">Status: Pendaftaran Dibuka</p>
+                <p style="font-size:0.85rem; color:#777; font-style:italic; margin-bottom:12px;">(Lomba Bercerita Legenda Nias untuk Pelajar)</p>
+                <hr>
+                <p>📅 Sabtu, 18 April 2026</p>
+                <p>🕒 09.00 WIB – Selesai</p>
+                <p>📍 Aula Perpustakaan & Live YouTube</p>
+                <br>
+                <a href="https://wa.me/6281360758627" target="_blank" class="btn-green">Daftar Sekarang</a>
+            </div>
+        </div>
+        <div class="card-nhl">
+            <div class="card-nhl-body">
+                <h3>LOMBA MENULIS CERPEN</h3>
+                <p class="event-status-open">Status: Pendaftaran Dibuka!</p>
+                <p style="font-size:0.85rem; color:#777; font-style:italic; margin-bottom:12px;">"Melestarikan Legenda Nias Lewat Tulisan"</p>
+                <hr>
+                <p>📅 Deadline: 20 Mei 2026</p>
+                <p>🏆 Total Hadiah: Rp 2.000.000</p>
+                <p>📧 desmor830@gmail.com</p>
+                <br>
+                <a href="https://wa.me/6281360758627" target="_blank" class="btn-green">Daftar Sekarang</a>
+            </div>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
+</div>
 
-    <p>Email: desmor830@gmail.com</p>
-    <p>WhatsApp: 0813-6075-8627</p>
+<!-- ============================= MAPS ============================= -->
+<div id="maps" class="page">
+    <div id="nav-maps"></div>
+    <div class="section-hero">
+        <h2>Peta Navigasi & Panduan NHL</h2>
+        <p>Klik pada kotak menu di bawah ini untuk langsung menuju halaman yang Anda cari.</p>
+    </div>
+    <div class="cards-grid">
+        <div class="map-card" onclick="navTo('home')">
+            <h3>🏠 HOME (Beranda)</h3>
+            <p>Halaman utama berisi sambutan, kalkulator, dan kamus kecil bahasa Nias.</p>
+        </div>
+        <div class="map-card" onclick="navTo('collection')">
+            <h3>📚 COLLECTION (Koleksi)</h3>
+            <p>Buku Digital, Jurnal Penelitian, Koleksi Sejarah Budaya Nias, dan Video.</p>
+        </div>
+        <div class="map-card" onclick="navTo('service')">
+            <h3>🛠️ SERVICE (Layanan)</h3>
+            <p>Informasi jam buka dan layanan perpustakaan.</p>
+        </div>
+        <div class="map-card" onclick="navTo('profil')">
+            <h3>🏛️ PROFIL (Tentang Kami)</h3>
+            <p>Sejarah berdirinya NHL, Visi dan Misi.</p>
+        </div>
+        <div class="map-card" onclick="navTo('event')">
+            <h3>📅 EVENT (Kegiatan)</h3>
+            <p>Jadwal Lomba Menulis, Storytelling, Webinar, dan pendaftaran event.</p>
+        </div>
+        <div class="map-card" onclick="navTo('contact')">
+            <h3>📞 CONTACT US (Hubungi Kami)</h3>
+            <p>WhatsApp, email, dan formulir pesan singkat.</p>
+        </div>
+        <div class="map-card map-card-admin" onclick="navTo('admin')">
+            <h3>🔑 ADMIN</h3>
+            <p>Kontak dan informasi admin yang bisa diakses pengguna.</p>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
+</div>
 
-    <p><a href="https://www.instagram.com/desri_hia">Instagram</a></p>
-    <p><a href="https://www.facebook.com/share/1GPpua2KP3/">Facebook</a></p>
-
-    <h3>Formulir Pesan</h3>
-    <form>
-        Nama:<br>
-        <input type="text"><br><br>
-
-        Email:<br>
-        <input type="email"><br><br>
-
-        Pesan:<br>
-        <textarea rows="4" cols="30"></textarea><br><br>
-
-        <input type="submit" value="Kirim">
-    </form>
-</div>          
-
+<!-- ============================= ADMIN ============================= -->
 <div id="admin" class="page">
-    <nav>
-        <button onclick="showPage('home')">Home</button>
-        <button onclick="showPage('collection')">Collection</button>
-        <button onclick="showPage('service')">Service</button>
-        <button onclick="showPage('profile')">Profile</button>
-        <button onclick="showPage('contact')">Contact Us</button>
-        <button onclick="showPage('admin')">Admin</button>
-        <button onclick="logout()">Logout</button>
-    </nav>
-
-    <hr>
-
-    <h2>Admin</h2>
-
-    <p>
-        <a href="https://wa.me/6281360758627" target="_blank" rel="noopener noreferrer">
-            WhatsApp Admin
+    <div id="nav-admin"></div>
+    <div class="section-hero">
+        <h2>Admin</h2>
+        <p>Informasi kontak dan profil admin.</p>
+    </div>
+    <div class="content-wrapper">
+        <a href="https://wa.me/6281360758627" target="_blank" class="admin-link">
+            <i class="bi bi-whatsapp"></i> WhatsApp Admin
         </a>
-    </p>
-
-    <p>
-        <a href="https://www.instagram.com/desri_hia" target="_blank" rel="noopener noreferrer">
-            Instagram
+        <a href="https://www.instagram.com/desri_hia" target="_blank" class="admin-link">
+            <i class="bi bi-instagram"></i> Instagram
         </a>
-    </p>
-
-    <p>
-        <a href="https://www.facebook.com/share/1GPpua2KP3/" target="_blank" rel="noopener noreferrer">
-            Facebook
+        <a href="https://www.facebook.com/share/1GPpua2KP3/" target="_blank" class="admin-link">
+            <i class="bi bi-facebook"></i> Facebook
         </a>
-    </p>
-
-    <p>
-        <a href="https://drive.google.com/file/d/1wZL1pqHDX50uAKH0aYgl5e1xYB8LVlVf/view?usp=drivesdk" target="_blank" rel="noopener noreferrer">
-            Curriculum Vitae
+        <a href="https://drive.google.com/file/d/1wZL1pqHDX50uAKH0aYgl5e1xYB8LVlVf/view?usp=drivesdk" target="_blank" class="admin-link">
+            <i class="bi bi-file-person-fill"></i> Curriculum Vitae
         </a>
-    </p>
-</div>
-             
-<div class="whatsapp">
-    <a href="https://wa.me/6281360758627" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/220/220236.png">
-    </a>
+        <div class="profil-section" style="margin-top:1.5rem;">
+            <h4>Pantai Sorake Nias Selatan</h4>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/JfZl9T-YJ5E?si=WaMBpOQAryUcGuR1" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    <footer><p>NHL 2026 | Rancangan Desri Moralina Hia</p></footer>
 </div>
 
+<!-- ============================= WHATSAPP FLOAT ============================= -->
+<a href="https://wa.me/6281360758627" target="_blank" class="whatsapp-float" id="waFloat" style="display:none;">
+    <i class="bi bi-whatsapp"></i>
+</a>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const PAGES_WITH_NAV = ['home','collection','service','profil','contact','event','maps','admin'];
+
+    function buildNavbar(pageId) {
+        const template = document.getElementById('navbarTemplate');
+        const navTarget = document.getElementById('nav-' + pageId);
+        if (!navTarget || navTarget.children.length > 0) return;
+        const clone = template.content.cloneNode(true);
+        navTarget.appendChild(clone);
+        updateActiveLinks(pageId);
+    }
+
+    function updateActiveLinks(pageId) {
+        document.querySelectorAll('.desktop-nav a, .drawer-nav a').forEach(a => {
+            a.classList.remove('active');
+            const onclick = a.getAttribute('onclick') || '';
+            if (onclick.includes("'" + pageId + "'")) a.classList.add('active');
+        });
+    }
+
+    function navTo(pageId) {
+        closeDrawer();
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(pageId);
+        if (target) {
+            target.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        const waFloat = document.getElementById('waFloat');
+        if (PAGES_WITH_NAV.includes(pageId)) {
+            buildNavbar(pageId);
+            waFloat.style.display = 'flex';
+        } else {
+            waFloat.style.display = 'none';
+        }
+        updateActiveLinks(pageId);
+    }
+
+    function toggleDrawer() {
+        const drawer = document.getElementById('navDrawer');
+        const overlay = document.getElementById('navOverlay');
+        const btn = document.getElementById('hamburgerBtn');
+        drawer.classList.toggle('open');
+        overlay.classList.toggle('open');
+        if (btn) btn.classList.toggle('open');
+    }
+
+    function closeDrawer() {
+        document.getElementById('navDrawer').classList.remove('open');
+        document.getElementById('navOverlay').classList.remove('open');
+        const btn = document.getElementById('hamburgerBtn');
+        if (btn) btn.classList.remove('open');
+    }
+
+    function doLogout() {
+        closeDrawer();
+        document.querySelectorAll('form').forEach(f => f.reset());
+        navTo('login');
+    }
+
+    // Kalkulator
+    function hitungKalkulator() {
+        var a = parseFloat(document.getElementById("angka1").value) || 0;
+        var b = parseFloat(document.getElementById("angka2").value) || 0;
+        var op = document.getElementById("operator").value;
+        var hasil;
+        if (op === "+") hasil = a + b;
+        else if (op === "-") hasil = a - b;
+        else if (op === "*") hasil = a * b;
+        else if (op === "/") hasil = b !== 0 ? a / b : "Tidak bisa dibagi 0";
+        var r = document.getElementById("hasil");
+        r.innerHTML = "Hasil: <strong>" + (isNaN(hasil) ? "—" : hasil) + "</strong>";
+    }
+
+    // Kamus
+    function cariArti() {
+        var kata = document.getElementById("inputKata").value.toLowerCase().trim();
+        var hasil = document.getElementById("hasilKamus");
+        var kamus = {
+            "ya'ahowu": "Salam khas Nias (Semoga diberkati).",
+            "omo hada": "Rumah adat tradisional Nias.",
+            "hombo batu": "Tradisi lompat batu (Fahombo).",
+            "afo": "Sirih (biasanya disuguhkan untuk tamu kehormatan).",
+            "tano niha": "Tanah Nias (sebutan orang Nias untuk pulau mereka).",
+            "ono niha": "Anak Nias (sebutan untuk suku bangsa Nias).",
+            "malu": "Hormat / Sopan.",
+            "saohagolo": "Terima kasih.",
+            "hezo": "Mana / Ke mana."
+        };
+        if (!kata) {
+            hasil.innerHTML = "Silakan ketik satu kata di atas!";
+        } else if (kamus[kata]) {
+            hasil.innerHTML = "<strong>Arti:</strong> " + kamus[kata];
+        } else {
+            hasil.innerHTML = "Maaf, kata '<em>" + kata + "</em>' belum ada di kamus kami.";
+        }
+    }
+
+    // Countdown Timer
+    function updateCountdown() {
+        var eventDate = new Date("March 30, 2026 10:00:00").getTime();
+        var now = new Date().getTime();
+        var distance = eventDate - now;
+        var el = document.getElementById("timer");
+        if (!el) return;
+        if (distance < 0) {
+            el.innerHTML = "<b style='color:red;'>Sedang Berlangsung / Sudah Selesai</b>";
+        } else {
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            el.innerHTML = "⏰ Waktu Tersisa: " + days + " Hari " + hours + " Jam " + minutes + " Menit";
+        }
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+</script>
 </body>
 </html>
